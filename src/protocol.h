@@ -12,6 +12,7 @@ typedef struct {
 
 typedef struct {
     uint8_t protocol_version;
+    uint8_t data_type;
 
     _Position goal_pose;
     _Position middle_goal_pose;
@@ -37,15 +38,15 @@ typedef struct {
 
 typedef struct {
     uint8_t protocol_version;
+    uint8_t data_type;
     _Position dwa_position;
 } _dwa_result;
 
 typedef struct {
     uint8_t protocol_version;
-    _Position own_machine_position;
+    uint8_t data_type;
+    _Position current_pose;
     _Position ball_position;
-    uint32_t number_of_obstacles;
-    int32_t obstacle_x[MAX_OBSTACLE_NUM];
-    int32_t obstacle_y[MAX_OBSTACLE_NUM];
-    int32_t obstacle_theta[MAX_OBSTACLE_NUM];
+    uint8_t number_of_obstacles;
+    _Position obstacles[MAX_OBSTACLE_NUM];
 } _vision_data;
