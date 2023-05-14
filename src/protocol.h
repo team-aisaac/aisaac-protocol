@@ -11,6 +11,15 @@ typedef struct {
 } _Position;
 
 typedef struct {
+    int32_t x;
+    int32_t y;
+    int32_t theta;
+    int32_t vx;
+    int32_t vy;
+} _Obstacle;
+
+
+typedef struct {
     uint8_t protocol_version;
     uint8_t data_type;
 
@@ -20,7 +29,7 @@ typedef struct {
     bool middle_target_flag;
     bool halt_flag;
     // Kick
-    int32_t kick_power;
+    uint32_t kick_power;
     _Position ball_goal;
     int32_t ball_target_allowable_error;
     uint8_t kick_type;
@@ -48,5 +57,5 @@ typedef struct {
     _Position current_pose;
     _Position ball_position;
     uint8_t number_of_obstacles;
-    _Position obstacles[MAX_OBSTACLE_NUM];
+    _Obstacle obstacles[MAX_OBSTACLE_NUM];
 } _vision_data;

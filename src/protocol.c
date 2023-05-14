@@ -4,7 +4,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
-// #include <stdio.h>
+#include <stdio.h>
 
 #define RX_ASSERT(x) (assert(send.x == recv.x));
 
@@ -121,9 +121,9 @@ int decodeStrategyPcCommand(_strategy_pc_command *command, char *buffer, uint8_t
     memcpy(&tmp_u32, &buffer[buffer_index], 4);
     command->middle_goal_pose.theta = ntohl(tmp_u32);
     buffer_index += 4;
-    command->prohibited_zone_ignore = (buffer[buffer_index] == 0b100);
-    command->middle_target_flag = (buffer[buffer_index] == 0b10);
-    command->halt_flag = (buffer[buffer_index] == 0b1);
+    command->prohibited_zone_ignore = (buffer[buffer_index] & 0b100) == 0b100;
+    command->middle_target_flag = (buffer[buffer_index] & 0b10) == 0b10;
+    command->halt_flag = (buffer[buffer_index] & 0b1) == 0b1;
     buffer_index += 1;
     // Kick
     memcpy(&tmp_u32, &buffer[buffer_index], 4);
@@ -143,10 +143,10 @@ int decodeStrategyPcCommand(_strategy_pc_command *command, char *buffer, uint8_t
     buffer_index += 4;
     command->kick_type = buffer[buffer_index];
     buffer_index += 1;
-    command->ball_kick_state = (buffer[buffer_index] == 0b1000);
-    command->ball_kick = (buffer[buffer_index] == 0b100);
-    command->ball_kick_active = (buffer[buffer_index] == 0b10);
-    command->free_kick_flag = (buffer[buffer_index] == 0b1);
+    command->ball_kick_state = (buffer[buffer_index] & 0b1000) == 0b1000;
+    command->ball_kick = (buffer[buffer_index] & 0b100) == 0b100;
+    command->ball_kick_active = (buffer[buffer_index] & 0b10) == 0b10;
+    command->free_kick_flag = (buffer[buffer_index] & 0b1) == 0b1;
     buffer_index += 1;
     // Dribble
     memcpy(&tmp_u32, &buffer[buffer_index], 4);
@@ -164,8 +164,8 @@ int decodeStrategyPcCommand(_strategy_pc_command *command, char *buffer, uint8_t
     memcpy(&tmp_u32, &buffer[buffer_index], 4);
     command->dribble_complete_distance = ntohl(tmp_u32);
     buffer_index += 4;
-    command->dribble_state = (buffer[buffer_index] == 0b10);
-    command->dribbler_active = (buffer[buffer_index] == 0b1);
+    command->dribble_state = (buffer[buffer_index] & 0b10) == 0b10;
+    command->dribbler_active = (buffer[buffer_index] & 0b1) == 0b1;
     buffer_index += 1;
 
     return buffer_index;
@@ -262,6 +262,12 @@ int encodeVisionData(_vision_data *vision_data, char *buffer) {
         tmp_u32 = htonl(vision_data->obstacles[obstacle_index].theta);
         memcpy(&buffer[buffer_index], &tmp_u32, 4);
         buffer_index += 4;
+        tmp_u32 = htonl(vision_data->obstacles[obstacle_index].vx);
+        memcpy(&buffer[buffer_index], &tmp_u32, 4);
+        buffer_index += 4;
+        tmp_u32 = htonl(vision_data->obstacles[obstacle_index].vy);
+        memcpy(&buffer[buffer_index], &tmp_u32, 4);
+        buffer_index += 4;
     }
 
     return buffer_index;
@@ -271,7 +277,7 @@ int decodeVisionData(_vision_data *vision_data, char *buffer, uint16_t buffer_le
     uint16_t buffer_index = 0;
     uint32_t tmp_u32;
     // Check buffer length
-    assert(buffer_length > 399);
+    assert(buffer_length > 647);
 
     assert((uint8_t)buffer[buffer_index] == protocol_version);
     vision_data->protocol_version = protocol_version;
@@ -313,6 +319,12 @@ int decodeVisionData(_vision_data *vision_data, char *buffer, uint16_t buffer_le
         memcpy(&tmp_u32, &buffer[buffer_index], 4);
         vision_data->obstacles[obstacle_index].theta = ntohl(tmp_u32);
         buffer_index += 4;
+        memcpy(&tmp_u32, &buffer[buffer_index], 4);
+        vision_data->obstacles[obstacle_index].vx = ntohl(tmp_u32);
+        buffer_index += 4;
+        memcpy(&tmp_u32, &buffer[buffer_index], 4);
+        vision_data->obstacles[obstacle_index].vy = ntohl(tmp_u32);
+        buffer_index += 4;
     }
 
     return buffer_index;
@@ -337,7 +349,7 @@ int main() {
         send.ball_goal.theta = 40000;
         send.ball_target_allowable_error = 5000;
         send.kick_type = 3;
-        send.ball_kick_active = true;
+        send.ball_kick_state = true;
         send.ball_kick = false;
         send.ball_kick_active = true;
         send.free_kick_flag = false;
@@ -351,8 +363,15 @@ int main() {
 
         char buffer[200];
 
-        encodeStrategyPcCommand(&send, &buffer[0]);
+        int length = encodeStrategyPcCommand(&send, &buffer[0]);
         decodeStrategyPcCommand(&recv, &buffer[0], 200);
+
+        printf("len: %d\r\n", length);
+        printf("[ ");
+        for (int i = 0; i < length; i++) {
+            printf("%d, ", (uint8_t)buffer[i]);
+        }
+        printf(" ];\r\n");
 
         RX_ASSERT(goal_pose.x)
         RX_ASSERT(goal_pose.y)
@@ -392,8 +411,15 @@ int main() {
 
         char buffer[15];
 
-        encodeDwaResult(&send, &buffer[0]);
+        int length = encodeDwaResult(&send, &buffer[0]);
         decodeDwaResult(&recv, &buffer[0], 15);
+
+        printf("len: %d\r\n", length);
+        printf("[ ");
+        for (int i = 0; i < length; i++) {
+            printf("%d, ", (uint8_t)buffer[i]);
+        }
+        printf(" ];\r\n");
 
         RX_ASSERT(dwa_position.x)
         RX_ASSERT(dwa_position.y)
@@ -403,8 +429,8 @@ int main() {
     {
         _vision_data send, recv;
         send.current_pose.x = 100;
-        send.current_pose.x = -100;
-        send.current_pose.x = 1000;
+        send.current_pose.y = -100;
+        send.current_pose.theta = 1000;
         send.ball_position.x = 200;
         send.ball_position.y = -200;
         send.number_of_obstacles = 31;
@@ -412,12 +438,21 @@ int main() {
             send.obstacles[i].x = 2000 + i;
             send.obstacles[i].y = -2000 - i;
             send.obstacles[i].theta = 20000 + i;
+            send.obstacles[i].vx = 3000 + i;
+            send.obstacles[i].vy = -3000 - i;
         }
 
-        char buffer[400];
+        char buffer[680];
 
-        encodeVisionData(&send, &buffer[0]);
-        decodeVisionData(&recv, &buffer[0], 400);
+        int length = encodeVisionData(&send, &buffer[0]);
+        decodeVisionData(&recv, &buffer[0], 680);
+
+        printf("len: %d\r\n", length);
+        printf("[ ");
+        for (int i = 0; i < length; i++) {
+            printf("%d, ", (uint8_t)buffer[i]);
+        }
+        printf(" ];\r\n");
 
         RX_ASSERT(current_pose.x)
         RX_ASSERT(current_pose.y)
