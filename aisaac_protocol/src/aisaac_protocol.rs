@@ -88,8 +88,8 @@ const STRATEGY_PC_COMMAND_DATA_TYPE: u8 = 0b10100001;
 const DWA_RESULT_DATA_TYPE: u8 = 0b10100010;
 const VISION_DATA_DATA_TYPE: u8 = 0b10100011;
 
-impl From<[u8; 70]> for StrategyPcCpmmand {
-    fn from(rx: [u8; 70]) -> Self {
+impl From<&[u8; 70]> for StrategyPcCpmmand {
+    fn from(rx: &[u8; 70]) -> Self {
         let mut _buffer_index: usize = 0;
         assert_eq!(rx[_buffer_index], PROTOCOL_VERSION);
         _buffer_index += 1;
@@ -204,8 +204,8 @@ impl From<DwaResult> for [u8; 14] {
         }
     }
 }
-impl From<[u8; 647]> for VisionData {
-    fn from(rx: [u8; 647]) -> Self {
+impl From<&[u8; 647]> for VisionData {
+    fn from(rx: &[u8; 647]) -> Self {
         let mut _buffer_index: usize = 0;
         assert_eq!(rx[_buffer_index], PROTOCOL_VERSION);
         _buffer_index += 1;
