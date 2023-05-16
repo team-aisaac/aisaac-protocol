@@ -83,10 +83,10 @@ pub struct VisionData {
     pub obstacles: [Obstacle; MAX_OBSTACLE_NUM],
 }
 
-const PROTOCOL_VERSION: u8 = 0b00100001;
-const STRATEGY_PC_COMMAND_DATA_TYPE: u8 = 0b10100001;
-const DWA_RESULT_DATA_TYPE: u8 = 0b10100010;
-const VISION_DATA_DATA_TYPE: u8 = 0b10100011;
+pub const PROTOCOL_VERSION: u8 = 0b00100001;
+pub const STRATEGY_PC_COMMAND_DATA_TYPE: u8 = 0b10100001;
+pub const DWA_RESULT_DATA_TYPE: u8 = 0b10100010;
+pub const VISION_DATA_DATA_TYPE: u8 = 0b10100011;
 
 impl From<&[u8]> for StrategyPcCpmmand {
     fn from(rx: &[u8]) -> Self {
