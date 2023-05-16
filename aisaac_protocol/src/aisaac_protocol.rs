@@ -151,6 +151,47 @@ impl From<[u8; 70]> for StrategyPcCpmmand {
     }
 }
 
+impl From<StrategyPcCpmmand> for [u8; 70] {
+    fn from(command: StrategyPcCpmmand) -> Self {
+        let mut _buffer = Vec::new();
+        let mut _buffer_index: usize = 0;
+
+        _buffer.push(PROTOCOL_VERSION);
+        _buffer.push(STRATEGY_PC_COMMAND_DATA_TYPE);
+
+        _buffer.extend(command.goal_pose.x.to_be_bytes());
+        _buffer.extend(command.goal_pose.y.to_be_bytes());
+        _buffer.extend(command.goal_pose.theta.to_be_bytes());
+        _buffer.extend(command.middle_goal_pose.x.to_be_bytes());
+        _buffer.extend(command.middle_goal_pose.y.to_be_bytes());
+        _buffer.extend(command.middle_goal_pose.theta.to_be_bytes());
+        _buffer.push((command.prohibited_zone_ignore as u8) << 2 |
+            (command.middle_target_flag as u8) << 1 |
+            command.halt_flag as u8);
+        // Kick
+        _buffer.extend(command.kick_power.to_be_bytes());
+        _buffer.extend(command.ball_goal.x.to_be_bytes());
+        _buffer.extend(command.ball_goal.y.to_be_bytes());
+        _buffer.extend(command.ball_goal.theta.to_be_bytes());
+        _buffer.extend(command.ball_target_allowable_error.to_be_bytes());
+        _buffer.push(command.kick_type);
+        _buffer.push((command.ball_kick_state as u8) << 3 |
+            (command.ball_kick as u8) << 2 |
+            (command.ball_kick_active as u8) << 1 |
+            command.free_kick_flag as u8);
+        // Dribble
+        _buffer.extend(command.dribble_power.to_be_bytes());
+        _buffer.extend(command.dribble_goal.x.to_be_bytes());
+        _buffer.extend(command.dribble_goal.y.to_be_bytes());
+        _buffer.extend(command.dribble_goal.theta.to_be_bytes());
+        _buffer.extend(command.dribble_complete_distance.to_be_bytes());
+        _buffer.push((command.dribble_state as u8) << 1 |
+            command.dribbler_active as u8);
+
+        _buffer.try_into().unwrap()
+    }
+}
+
 impl From<DwaResult> for [u8; 14] {
     fn from(dwa: DwaResult) -> Self {
         let mut _buffer_index: usize = 0;

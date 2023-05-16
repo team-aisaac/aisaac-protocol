@@ -41,6 +41,33 @@ mod tests {
         assert_eq!(command.dribble_complete_distance, 8000);
         assert_eq!(command.dribble_state, true);
         assert_eq!(command.dribbler_active, false);
+
+        let tx_command = aisaac_protocol::StrategyPcCpmmand {
+            protocol_version: 0b00100001,
+            data_type: 0b10100001,
+
+            goal_pose: aisaac_protocol::Position { x: 1000, y: -1000, theta: 10000 },
+            middle_goal_pose: aisaac_protocol::Position { x: 2000, y: -2000, theta: 20000 },
+            prohibited_zone_ignore: false,
+            middle_target_flag: true,
+            halt_flag: false,
+            kick_power: 3000,
+            ball_goal: aisaac_protocol::Position { x: 4000, y: -4000, theta: 40000 },
+            ball_target_allowable_error: 5000,
+            kick_type: 3,
+            ball_kick_state: true,
+            ball_kick: false,
+            ball_kick_active: true,
+            free_kick_flag: false,
+            dribble_power: 6000,
+            dribble_goal: aisaac_protocol::Position { x: 7000, y: -7000, theta: 70000 },
+            dribble_complete_distance: 8000,
+            dribble_state: true,
+            dribbler_active: false
+        };
+
+        let encoded_command: [u8; 70] = tx_command.into();
+        assert_eq!(encoded_command, rx_command);
     }
 
     #[test]
