@@ -5,57 +5,96 @@
 #define MAX_OBSTACLE_NUM 31
 
 typedef struct {
-    int32_t x;
-    int32_t y;
-    int32_t theta;
-} _Position;
-
-typedef struct {
-    int32_t x;
-    int32_t y;
-    int32_t theta;
-    int32_t vx;
-    int32_t vy;
-} _Obstacle;
-
-
-typedef struct {
     uint8_t protocol_version;
     uint8_t data_type;
 
-    _Position goal_pose;
-    _Position middle_goal_pose;
-    bool prohibited_zone_ignore;
-    bool middle_target_flag;
     bool halt_flag;
-    // Kick
-    uint32_t kick_power;
-    _Position ball_goal;
-    int32_t ball_target_allowable_error;
-    uint8_t kick_type;
-    bool ball_kick_state;
-    bool ball_kick;
-    bool ball_kick_active;
-    bool free_kick_flag;
+    bool stop_game_flag;
+    bool ball_placement_flag;
+    bool ball_placement_team;
+    bool in_game;
+    bool robot_position_init;
     // Dribble
-    uint32_t dribble_power;
-    _Position dribble_goal;
-    int32_t dribble_complete_distance;
     bool dribble_state;
-    bool dribbler_active;
+    bool dribble_advance;
+    uint16_t dribble_enabble_error;
+    int16_t dribble_target_ball_x;
+    int16_t dribble_target_ball_y;
+    uint8_t dribble_type;
+    // Kick
+    bool ball_kick_state;
+    bool free_kick_flag;
+    bool ball_kick;
+    bool kick_straight;
+    uint16_t ball_target_allowable_error;
+    int16_t target_ball_x;
+    int16_t target_ball_y;
+    uint8_t kick_type;
+    // Target position
+    int16_t robot_position_target_x;
+    int16_t robot_position_target_y;
+    int16_t robot_position_target_theta;
 } _strategy_pc_command;
 
 typedef struct {
-    uint8_t protocol_version;
-    uint8_t data_type;
-    _Position dwa_position;
-} _dwa_result;
+    int16_t x;
+    int16_t y;
+    int16_t theta;
+    int16_t vx;
+    int16_t vy;
+    int16_t omega;
+    bool camera_valid;
+    bool data_valid;
+} _ssl_vision_robot_data;
+
+typedef struct {
+    int16_t x;
+    int16_t y;
+    int16_t vx;
+    int16_t vy;
+    bool camera_valid;
+    bool data_valid;
+} _ssl_vision_ball_data;
 
 typedef struct {
     uint8_t protocol_version;
     uint8_t data_type;
-    _Position current_pose;
-    _Position ball_position;
+
+    _ssl_vision_robot_data current_pose;
+    _ssl_vision_ball_data ball_position;
     uint8_t number_of_obstacles;
-    _Obstacle obstacles[MAX_OBSTACLE_NUM];
+    _ssl_vision_robot_data obstacles[MAX_OBSTACLE_NUM];
 } _vision_data;
+
+// Add Ver. 1.2
+typedef struct {
+    uint8_t protocol_version;
+    uint8_t data_type;
+
+    bool controller_start;
+    int32_t robot_vx;
+    int32_t robot_vy;
+    int32_t robot_vw;
+    bool dribbler_on;
+    bool kick_straight;
+    bool kick_tip;
+    bool emergency_stop;
+} _manual_controller_data;
+
+// Add Ver. 1.1
+typedef struct {
+    uint8_t protocol_version;
+    uint8_t data_type;
+
+    int16_t robot_position_x;
+    int16_t robot_position_y;
+    int16_t robot_position_theta;
+} _robot_odometry_data;
+
+typedef struct {
+    uint8_t protocol_version;
+    uint8_t data_type;
+    
+    int16_t ball_position_x;
+    int16_t ball_position_y;
+} _robot_observed_ball_data;
