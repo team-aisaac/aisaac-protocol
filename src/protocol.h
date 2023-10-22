@@ -1,8 +1,21 @@
-#pragma once
+#ifndef _PROTOCOL_H_
+#define _PROTOCOL_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #include <stdint.h>
 #include <stdbool.h>
 
 #define MAX_OBSTACLE_NUM 31
+#ifndef htons
+#define htons(x) __builtin_bswap16(x)
+#define ntohs(x) __builtin_bswap16(x)
+#define htonl(x) __builtin_bswap32(x)
+#define ntohl(x) __builtin_bswap32(x)
+#endif
+
 
 typedef struct {
     uint8_t protocol_version;
@@ -98,3 +111,19 @@ typedef struct {
     int16_t ball_position_x;
     int16_t ball_position_y;
 } _robot_observed_ball_data;
+
+int encodeStrategyPcCommand(_strategy_pc_command *command, char *buffer);
+int decodeStrategyPcCommand(_strategy_pc_command *command, char *buffer, uint8_t buffer_length);
+int encodeVisionData(_vision_data *vision_data, char *buffer);
+int decodeVisionData(_vision_data *vision_data, char *buffer, uint16_t buffer_length);
+int encodeManualContollerData(_manual_controller_data *controller_data, char *buffer);
+int decodeManualContollerData(_manual_controller_data *controller_data, char *buffer, uint8_t buffer_length);
+int encodeRobotOdometryData(_robot_odometry_data *odometry_data, char *buffer);
+int decodeRobotOdometryData(_robot_odometry_data *odometry_data, char *buffer, uint8_t buffer_length);
+int encodeRobotObservedBallData(_robot_observed_ball_data *ball_data, char *buffer);
+int decodeRobotObservedBallData(_robot_observed_ball_data *ball_data, char *buffer, uint8_t buffer_length);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+#endif /* _PROTOCOL_H_ */
