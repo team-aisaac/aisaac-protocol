@@ -15,6 +15,7 @@ const uint8_t vision_data_data_type = 0b10100011;   // 5-3
 const uint8_t manual_controller_data_type = 0b10100100; // 5-4
 const uint8_t robot_odometry_data_type = 0b10100101; // 5-5
 const uint8_t robot_observed_ball_data_type = 0b10100110;    // 5-6
+const uint8_t robot_debug_data_type = 0b10100111;    // 5-7
 
 int encodeStrategyPcCommand(_strategy_pc_command *command, char *buffer) {
     uint8_t buffer_index = 0;

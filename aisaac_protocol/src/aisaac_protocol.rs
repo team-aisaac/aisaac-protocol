@@ -140,6 +140,7 @@ pub const VISION_DATA_DATA_TYPE: u8 = 0b10100011;
 pub const MANUAL_CONTROLLER_DATA_TYPE: u8 = 0b10100100;
 pub const ROBOT_ODOMETRY_DATA_TYPE: u8 = 0b10100101;
 pub const ROBOT_OBSERVED_BALL_DATA_TYPE: u8 = 0b10100110;
+pub const ROBOT_DEBUG_DATA_TYPE: u8 = 0b10100111;
 
 impl From<&[u8]> for StrategyPcCpmmand {
     fn from(rx: &[u8]) -> Self {
